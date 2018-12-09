@@ -15,13 +15,13 @@ public class MessengerImpl implements Messenger {
     private static final Logger log = LoggerFactory.getLogger(MessengerImpl.class);
     private BufferedReader reader;
 
-    private void init() {
-        reader = new BufferedReader(new InputStreamReader(System.in));
-        log.info("Reader initiated");
-    }
-
     @Override
     public String askQuestion(String question) {
+        if (reader == null) {
+            reader = new BufferedReader(new InputStreamReader(System.in));
+            log.info("Reader initiated");
+        }
+
         String answer = "";
         try {
             System.out.println(question);
@@ -32,12 +32,15 @@ public class MessengerImpl implements Messenger {
         return answer;
     }
 
-    private void close() {
-        try {
-            reader.close();
-        } catch (IOException e) {
-            log.error("Reader was not closed properly", e);
+    @Override
+    public void close() {
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                log.error("Reader was not closed properly", e);
+            }
+            log.info("Reader closed");
         }
-        log.info("Reader closed");
     }
 }

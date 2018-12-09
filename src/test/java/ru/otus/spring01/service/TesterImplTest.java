@@ -1,6 +1,7 @@
 package ru.otus.spring01.service;
 
 import org.junit.Test;
+import org.springframework.context.MessageSource;
 import ru.otus.spring01.controller.Messenger;
 
 import java.io.ByteArrayOutputStream;
@@ -11,7 +12,9 @@ import java.util.Map;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,8 +22,6 @@ import static org.mockito.Mockito.when;
  * Created by хитрый жук on 01.12.2018.
  */
 public class TesterImplTest {
-
-    private final String FILE_NAME = "questions.csv";
 
     @Test
     public void testerTest() {
@@ -35,7 +36,7 @@ public class TesterImplTest {
         questionnaire.put("2+2?", "4");
         questionnaire.put("Best programming language?", "java");
         questionnaire.put("Best java framework?", "spring");
-        when(parser.parseQuestionsFromFile(FILE_NAME)).thenReturn(questionnaire);
+        when(parser.parseQuestionsFromFile(any())).thenReturn(questionnaire);
 
         Messenger messenger = mock(Messenger.class);
         when(messenger.askQuestion(anyString()))
@@ -47,8 +48,12 @@ public class TesterImplTest {
                 .thenReturn("java")
                 .thenReturn("spring");
 
-        TesterImpl tester = new TesterImpl(parser, messenger);
-        tester.testStudents(FILE_NAME);
+        MessageSource messageSource = mock(MessageSource.class);
+        when(messageSource.getMessage(eq("correct.answers"), eq(new Object[]{5}), any()))
+                .thenReturn("Number of correct answers is 5 out of 5 possible");
+
+        TesterImpl tester = new TesterImpl(parser, messenger, messageSource);
+        tester.testStudents();
 
         String result = out.toString();
         String expected = "Ivan Ivanov\r\nNumber of correct answers is 5 out of 5 possible\r\n";

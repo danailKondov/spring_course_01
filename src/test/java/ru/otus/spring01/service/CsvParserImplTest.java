@@ -15,7 +15,7 @@ public class CsvParserImplTest {
     @Test
     public void parserTest() {
         CsvParserImpl parser = new CsvParserImpl();
-        Map<String,String> map = parser.parseQuestionsFromFile("test-questions.csv");
+        Map<String,String> map = parser.parseQuestionsFromFile("test-questions-en.csv");
         String result = map.toString();
         String expected = "{" +
                 "\"Biggest country in Europe?\"=Russia, " +
