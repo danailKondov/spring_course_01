@@ -1,35 +1,14 @@
 package ru.otus.spring01;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import ru.otus.spring01.controller.Messenger;
-import ru.otus.spring01.controller.MessengerImpl;
-import ru.otus.spring01.service.CsvParser;
-import ru.otus.spring01.service.CsvParserImpl;
-import ru.otus.spring01.service.Tester;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-@PropertySource("classpath:app.properties")
-@Configuration
-@ComponentScan
+@EnableAspectJAutoProxy
+@SpringBootApplication
 public class Main {
 
     public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
-        Tester tester = context.getBean(Tester.class);
-        tester.testStudents();
-        tester.close();
-    }
-
-    @Bean
-    Messenger messenger() {
-        return new MessengerImpl();
-    }
-
-    @Bean
-    CsvParser parser() {
-        return new CsvParserImpl();
+        SpringApplication.run(Main.class, args);
     }
 }

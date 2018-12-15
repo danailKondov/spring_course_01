@@ -1,7 +1,5 @@
 package ru.otus.spring01.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -9,17 +7,18 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import ru.otus.spring01.controller.Messenger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by хитрый жук on 01.12.2018.
+ * Created by хитрый жук on 15.12.2018.
  */
 @Service
 public class TesterImpl implements Tester {
 
-    private static final Logger log = LoggerFactory.getLogger(TesterImpl.class);
     private CsvParser parser;
     private Messenger messenger;
     private Locale locale;
@@ -39,6 +38,11 @@ public class TesterImpl implements Tester {
         this.parser = parser;
         this.messenger = messenger;
         this.messageSource = messageSource;
+    }
+
+    @PostConstruct
+    public void startApp() {
+        testStudents();
     }
 
     @Override
@@ -71,6 +75,11 @@ public class TesterImpl implements Tester {
     @Override
     public void setLocale(Locale locale) {
         this.locale = locale;
+    }
+
+    @PreDestroy
+    public void closeResources() {
+        close();
     }
 
     private void defineLocale() {

@@ -2,6 +2,7 @@ package ru.otus.spring01.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.Map;
 /**
  * Created by хитрый жук on 30.11.2018.
  */
+@Component
 public class CsvParserImpl implements CsvParser {
 
     private static final Logger log = LoggerFactory.getLogger(CsvParserImpl.class);

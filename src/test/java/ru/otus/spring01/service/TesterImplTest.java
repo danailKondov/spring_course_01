@@ -13,7 +13,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,7 +38,7 @@ public class TesterImplTest {
         when(parser.parseQuestionsFromFile(any())).thenReturn(questionnaire);
 
         Messenger messenger = mock(Messenger.class);
-        when(messenger.askQuestion(anyString()))
+        when(messenger.askQuestion(any()))
                 .thenReturn("Ivan")
                 .thenReturn("Ivanov")
                 .thenReturn("Russia")

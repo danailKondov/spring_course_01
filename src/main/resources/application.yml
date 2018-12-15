@@ -1,0 +1,6 @@
+file:
+  name:
+    en: questions-en.csv
+    ru: questions-ru.csv
+
+language: en

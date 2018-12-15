@@ -5,34 +5,34 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.otus.spring01.config.TestConfig;
-import ru.otus.spring01.controller.Messenger;
+import ru.otus.spring01.controller.MessengerImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by хитрый жук on 08.12.2018.
+ * Created by хитрый жук on 15.12.2018.
  */
-@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { TestConfig.class})
+@SpringBootTest
+@TestPropertySource(locations = "classpath:app-test.properties")
 public class TesterIT {
 
-    @Autowired
-    Messenger messenger;
+    @MockBean
+    MessengerImpl messenger;
 
     @Autowired
-    private Tester tester;
+    private TesterImpl tester;
 
     private ByteArrayOutputStream out;
     private PrintStream originalOut;
@@ -61,7 +61,7 @@ public class TesterIT {
 
         String result = out.toString();
         String expected = "Ivan Ivanov\r\nNumber of correct answers is 5 out of 5 possible\r\n";
-        assertThat(result, is(expected));
+        assertThat(result).contains(expected);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class TesterIT {
 
         String result = out.toString();
         String expected = "Иван Иванов\r\nКоличество правильных ответов - 5 из 5 возможных\r\n";
-        assertThat(result, is(expected));
+        assertThat(result).contains(expected);
     }
 
     @After
