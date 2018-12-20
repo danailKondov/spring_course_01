@@ -1,15 +1,13 @@
 package ru.otus.spring01.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import ru.otus.spring01.controller.Messenger;
+import ru.otus.spring01.model.TestResult;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,51 +18,43 @@ import java.util.Set;
 public class TesterImpl implements Tester {
 
     private CsvParser parser;
+    private MessageService messageService;
     private Messenger messenger;
-    private Locale locale;
-    private MessageSource messageSource;
-
-    @Value("${file.name.en}")
-    private String fileNameEN;
-
-    @Value("${file.name.ru}")
-    private String fileNameRu;
-
-    @Value("${language}")
-    private String language;
+    private List<TestResult> testResults = new ArrayList<>();
 
     @Autowired
-    public TesterImpl(CsvParser parser, Messenger messenger, MessageSource messageSource) {
+    public TesterImpl(CsvParser parser, MessageService messageService, Messenger messenger) {
         this.parser = parser;
+        this.messageService = messageService;
         this.messenger = messenger;
-        this.messageSource = messageSource;
-    }
-
-    @PostConstruct
-    public void startApp() {
-        testStudents();
     }
 
     @Override
     public void testStudents() {
-        if (locale == null) {
-            defineLocale();
-        }
-        String fileName = locale == Locale.ENGLISH ? fileNameEN : fileNameRu;
+        String fileName = messageService.getQuestionsFileName();
         Map<String,String> questionsAndAnswers = parser.parseQuestionsFromFile(fileName);
         int numOfGoodAnswers = 0;
         Set<String> questions = questionsAndAnswers.keySet();
-        String firstName = messenger.askQuestion(messageSource.getMessage("enter.first.name", new Object[]{}, locale));
-        String secondName = messenger.askQuestion(messageSource.getMessage("enter.second.name", new Object[]{}, locale));
+
+        TestResult result = new TestResult();
+        String firstName = messenger.askQuestion(messageService.getMessage("enter.first.name", new Object[]{}));
+        result.setFirstName(firstName);
+        String secondName = messenger.askQuestion(messageService.getMessage("enter.second.name", new Object[]{}));
+        result.setSecondName(secondName);
         for (String question : questions) {
             String answer = messenger.askQuestion(question);
             if (questionsAndAnswers.get(question).equals(answer)) {
                 numOfGoodAnswers++;
+                result.getResults().put(question, "+");
+            } else {
+                result.getResults().put(question, "-");
             }
         }
+        result.setNumOfGoodAnswers(numOfGoodAnswers);
+        testResults.add(result);
 
-        System.out.println(firstName + " " + secondName);
-        System.out.println(messageSource.getMessage("correct.answers", new Object[]{numOfGoodAnswers}, locale));
+        messenger.textMessage(firstName + " " + secondName);
+        messenger.textMessage(messageService.getMessage("correct.answers", new Object[]{numOfGoodAnswers}));
     }
 
     @Override
@@ -73,22 +63,12 @@ public class TesterImpl implements Tester {
     }
 
     @Override
-    public void setLocale(Locale locale) {
-        this.locale = locale;
+    public List<TestResult> getTestResults() {
+        return testResults;
     }
 
     @PreDestroy
     public void closeResources() {
         close();
-    }
-
-    private void defineLocale() {
-        if (language == null || language.isEmpty()) {
-            locale = LocaleContextHolder.getLocale();
-        } else if (language.equals("en")) {
-            locale = Locale.ENGLISH;
-        } else {
-            locale = new Locale("ru");
-        }
     }
 }

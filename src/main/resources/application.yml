@@ -4,3 +4,7 @@ file:
     ru: questions-ru.csv
 
 language: en
+
+logging:
+  level:
+    root: error

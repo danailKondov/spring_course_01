@@ -1,20 +1,19 @@
 package ru.otus.spring01.service;
 
 import org.junit.Test;
-import org.springframework.context.MessageSource;
 import ru.otus.spring01.controller.Messenger;
+import ru.otus.spring01.model.TestResult;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -24,10 +23,6 @@ public class TesterImplTest {
 
     @Test
     public void testerTest() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(out));
-
         CsvParser parser = mock(CsvParser.class);
         Map<String,String> questionnaire = new LinkedHashMap<>();
         questionnaire.put("Biggest country in Europe?", "Russia");
@@ -37,8 +32,12 @@ public class TesterImplTest {
         questionnaire.put("Best java framework?", "spring");
         when(parser.parseQuestionsFromFile(any())).thenReturn(questionnaire);
 
+        MessageService messageService = mock(MessageService.class);
+        when(messageService.getMessage(eq("enter.first.name"), any())).thenReturn("Ivan");
+        when(messageService.getMessage(eq("enter.second.name"), any())).thenReturn("Ivanov");
+
         Messenger messenger = mock(Messenger.class);
-        when(messenger.askQuestion(any()))
+        when(messenger.askQuestion(anyString()))
                 .thenReturn("Ivan")
                 .thenReturn("Ivanov")
                 .thenReturn("Russia")
@@ -47,17 +46,16 @@ public class TesterImplTest {
                 .thenReturn("java")
                 .thenReturn("spring");
 
-        MessageSource messageSource = mock(MessageSource.class);
-        when(messageSource.getMessage(eq("correct.answers"), eq(new Object[]{5}), any()))
-                .thenReturn("Number of correct answers is 5 out of 5 possible");
-
-        TesterImpl tester = new TesterImpl(parser, messenger, messageSource);
+        TesterImpl tester = new TesterImpl(parser, messageService, messenger);
         tester.testStudents();
 
-        String result = out.toString();
-        String expected = "Ivan Ivanov\r\nNumber of correct answers is 5 out of 5 possible\r\n";
-        assertThat(result, is(expected));
+        verify(messenger).textMessage("Ivan Ivanov");
+        verify(messageService).getMessage("correct.answers", new Object[]{5});
 
-        System.setOut(originalOut);
+        TestResult result = tester.getTestResults().get(0);
+        assertThat(result.getFirstName(), is("Ivan"));
+        assertThat(result.getSecondName(), is("Ivanov"));
+        assertThat(result.getNumOfGoodAnswers(), is(5));
+        assertThat(result.getResults().size(), is(5));
     }
 }

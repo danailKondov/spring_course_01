@@ -35,6 +35,11 @@ public class MessengerImpl implements Messenger {
     }
 
     @Override
+    public void textMessage(String message) {
+        System.out.println(message);
+    }
+
+    @Override
     public void close() {
         if (reader != null) {
             try {

@@ -41,3 +41,12 @@
 Перенести тесты и использовать spring-boot-test-starter 
 
 решение: см. ветку _migrate_to_spring_boot_
+
+
+##Перевести приложение для проведения опросов на Spring Shell
+
+Подключить Spring Shell, используя starter.
+
+Написать юнит-тесты и использовать spring-boot-test-starter 
+
+решение: см. ветку _add_spring_shell_
