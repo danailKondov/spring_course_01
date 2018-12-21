@@ -7,5 +7,7 @@ public interface Messenger {
 
     String askQuestion(String question);
 
+    void textMessage(String message);
+
     void close();
 }
